@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
+using orderAPi.App_Code;
 
 namespace orderAPi
 {
@@ -25,6 +26,13 @@ namespace orderAPi
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            string[] items = new string[] { };
+            items = new corsorigins().connectionString();
+            services.AddCors(options =>
+           {
+               options.AddPolicy("WeatherForecast",
+                   builder => builder.WithOrigins(items[0], items[1], items[2], items[3], items[4]).WithHeaders("Accept", "application/json").WithMethods("GET"));
+           });
             services.AddControllers();
         }
 
@@ -39,6 +47,8 @@ namespace orderAPi
             app.UseHttpsRedirection();
 
             app.UseRouting();
+
+            app.UseCors("CorsPolicy");
 
             app.UseAuthorization();
 
