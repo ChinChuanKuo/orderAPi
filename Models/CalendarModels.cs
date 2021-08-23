@@ -20,7 +20,7 @@ namespace orderAPi.Models
             List<Dictionary<string, object>> items = new List<Dictionary<string, object>>();
             foreach (DataRow dr in new database().checkSelectSql("mssql", "eatingstring", "exec eat.calendarorder @stdate,@endate;", dbparams).Rows)
             {
-                items.Add(new Dictionary<string, object>() { { "requireid", new Dictionary<string, object>() { { "orderid", dr["orderid"].ToString().TrimEnd() } } }, { "shop", JsonSerializer.Deserialize<Dictionary<string, object>>(dr["shop"].ToString().TrimEnd()) }, { "stdate", new Dictionary<string, object>() { { "data", $"{dr["stdate"].ToString().TrimEnd().Replace('/', '-')} {dr["sttime"].ToString().TrimEnd()}" } } }, { "endate", new Dictionary<string, object>() { { "data", $"{dr["endate"].ToString().TrimEnd().Replace('/', '-')} {dr["entime"].ToString().TrimEnd()}" } } }, { "success", dr["status"].ToString().TrimEnd() == "0" }, { "failed", dr["status"].ToString().TrimEnd() == "2" } });
+                items.Add(new Dictionary<string, object>() { { "category", new Dictionary<string, object>() { { "requireid", new Dictionary<string, object>() { { "orderid", dr["orderid"].ToString().TrimEnd() } } }, { "shop", JsonSerializer.Deserialize<Dictionary<string, object>>(dr["shop"].ToString().TrimEnd()) } } }, { "stdate", new Dictionary<string, object>() { { "data", $"{dr["stdate"].ToString().TrimEnd().Replace('/', '-')} {dr["sttime"].ToString().TrimEnd()}" } } }, { "endate", new Dictionary<string, object>() { { "data", $"{dr["endate"].ToString().TrimEnd().Replace('/', '-')} {dr["entime"].ToString().TrimEnd()}" } } }, { "success", dr["status"].ToString().TrimEnd() == "0" }, { "failed", dr["status"].ToString().TrimEnd() == "2" } });
             }
             return items;
         }
@@ -46,7 +46,7 @@ namespace orderAPi.Models
             var clientJson = JsonSerializer.Deserialize<Dictionary<string, object>>(clientinfo);
             var deviceJson = JsonSerializer.Deserialize<Dictionary<string, object>>(deviceinfo);
             var requiredJson = JsonSerializer.Deserialize<Dictionary<string, object>>(requiredinfo);
-            var dataJson = JsonSerializer.Deserialize<Dictionary<string, object>>(datainfo);            
+            var dataJson = JsonSerializer.Deserialize<Dictionary<string, object>>(datainfo);
             var randomJson = new UserinfoClass().checkRandom(clientJson);
             string nowdate = DateTime.Parse(dataJson["data"].ToString().TrimEnd()).ToString("yyyy/MM/dd");
             List<dbparam> dbparams = new List<dbparam>();

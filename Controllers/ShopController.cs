@@ -12,12 +12,10 @@ namespace orderAPi.Controllers
     {
         [HttpPost]
         [Route("chooseData")]
-        public ActionResult<Dictionary<string, object>> chooseData([FromForm] string clientinfo, [FromForm] string deviceinfo)
+        public Dictionary<string, object> chooseData([FromForm] string clientinfo, [FromForm] string deviceinfo)
         {
             string clientip = Request.HttpContext.Connection.RemoteIpAddress.ToString().TrimEnd() == "::1" ? "127.0.0.1" : Request.HttpContext.Connection.RemoteIpAddress.ToString().TrimEnd();
-            var shopClass = new ShopClass().GetChooseModels(clientinfo, deviceinfo, clientip);
-            if (shopClass.Count == 0) return NotFound();
-            return shopClass;
+            return new ShopClass().GetChooseModels(clientinfo, deviceinfo, clientip);
         }
 
         [HttpPost]

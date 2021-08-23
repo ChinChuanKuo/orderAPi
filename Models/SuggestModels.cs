@@ -18,7 +18,7 @@ namespace orderAPi.Models
             List<Dictionary<string, object>> items = new List<Dictionary<string, object>>();
             foreach (DataRow dr in new database().checkSelectSql("mssql", "eatingstring", "eat.searchsuggest @newid;", dbparams).Rows)
             {
-                items.Add(new Dictionary<string, object>() { { "requireid", new Dictionary<string, object>() { { "orderid", dr["orderid"].ToString().TrimEnd() } } }, { "shop", JsonSerializer.Deserialize<Dictionary<string, object>>(dr["shop"].ToString().TrimEnd()) }, { "date", new Dictionary<string, object>() { { "data", dr["indate"].ToString().TrimEnd() } } }, { "time", new Dictionary<string, object>() { { "data", dr["intime"].ToString().TrimEnd() } } } });
+                items.Add(new Dictionary<string, object>() { { "category", new Dictionary<string, object>() { { "requireid", new Dictionary<string, object>() { { "orderid", dr["orderid"].ToString().TrimEnd() } } }, { "shop", JsonSerializer.Deserialize<Dictionary<string, object>>(dr["shop"].ToString().TrimEnd()) } } }, { "date", new Dictionary<string, object>() { { "data", dr["indate"].ToString().TrimEnd() } } }, { "time", new Dictionary<string, object>() { { "data", dr["intime"].ToString().TrimEnd() } } } });
             }
             return items;
         }
@@ -65,7 +65,7 @@ namespace orderAPi.Models
             dbparams.Add(new dbparam("@neworid", orderid));
             dbparams.Add(new dbparam("@shop", mainRows.Rows[0]["shop"].ToString().TrimEnd()));
             if (database.checkActiveSql("mssql", "eatingstring", "exec eat.createsuggest @orderid,@neworid,@shop,@newid;", dbparams) != "istrue") return new Dictionary<string, object>() { };
-            return new Dictionary<string, object>() { { "requireid", new Dictionary<string, object>() { { "orderid", orderid } } }, { "shop", JsonSerializer.Deserialize<Dictionary<string, object>>(mainRows.Rows[0]["shop"].ToString().TrimEnd()) }, { "ordered", false }, { "items", new List<Dictionary<string, object>>() } };
+            return new Dictionary<string, object>() { { "requireid", new Dictionary<string, object>() { { "orderid", orderid } } }, { "shop", JsonSerializer.Deserialize<Dictionary<string, object>>(mainRows.Rows[0]["shop"].ToString().TrimEnd()) } };
         }
     }
 }

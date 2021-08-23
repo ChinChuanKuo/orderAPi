@@ -20,11 +20,11 @@ namespace orderAPi.Controllers
         }
 
         [HttpGet]
-        [Route("statistData")]
-        public Dictionary<string, object> statistData(string clientinfo, string deviceinfo)
+        [Route("totalData")]
+        public Dictionary<string, object> totalData(string clientinfo, string deviceinfo)
         {
             string clientip = Request.HttpContext.Connection.RemoteIpAddress.ToString().TrimEnd() == "::1" ? "127.0.0.1" : Request.HttpContext.Connection.RemoteIpAddress.ToString().TrimEnd();
-            return new PreviewClass().GetStatistModels(clientinfo, deviceinfo, clientip);
+            return new PreviewClass().GetTotalModels(clientinfo, deviceinfo, clientip);
         }
     }
 }

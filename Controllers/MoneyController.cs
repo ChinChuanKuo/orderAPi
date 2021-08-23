@@ -15,7 +15,7 @@ namespace orderAPi.Controllers
         public Dictionary<string, object> balanceData(string clientinfo, string deviceinfo)
         {
             string clientip = Request.HttpContext.Connection.RemoteIpAddress.ToString().TrimEnd() == "::1" ? "127.0.0.1" : Request.HttpContext.Connection.RemoteIpAddress.ToString().TrimEnd();
-            return new BankClass().GetBalenceModels(clientinfo, deviceinfo, clientip);
+            return new MoneyClass().GetBalenceModels(clientinfo, deviceinfo, clientip);
         }
 
         [HttpGet]

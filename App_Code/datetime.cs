@@ -48,13 +48,13 @@ namespace orderAPi.App_Code
                             switch (ts.Minutes)
                             {
                                 case 0:
-                                    return $"{ts.Seconds} secs";
+                                    return $"{ts.Seconds} sec";
                             }
-                            return $"{ts.Minutes} ms";
+                            return $"{ts.Minutes} min";
                     }
-                    return $"{ts.Hours} hs";
+                    return $"{ts.Hours} hr";
             }
-            return $"{ts.Days} days";
+            return $"{ts.Days} d";
         }
 
         public bool[] checkedBusiness(string ondate, string endate)
@@ -77,13 +77,13 @@ namespace orderAPi.App_Code
                             switch (ts.Minutes)
                             {
                                 case 0:
-                                    return $"{Math.Abs(ts.Seconds)} secs";
+                                    return $"{Math.Abs(ts.Seconds)} sec";
                             }
-                            return $"{Math.Abs(ts.Minutes)} ms";
+                            return $"{Math.Abs(ts.Minutes)} min";
                     }
-                    return $"{Math.Abs(ts.Hours)} hs";
+                    return $"{Math.Abs(ts.Hours)} hr";
             }
-            return $"{Math.Abs(ts.Days)} days";
+            return $"{Math.Abs(ts.Days)} d";
         }
 
         public int differentimeInt(string beforedate)
