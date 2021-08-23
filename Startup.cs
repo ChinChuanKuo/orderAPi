@@ -48,7 +48,7 @@ namespace orderAPi
                   builder => builder.WithOrigins(items[0], items[1], items[2], items[3], items[4]).WithHeaders("Accept").WithMethods("GET"));
                options.AddPolicy("Profile",
                   builder => builder.WithOrigins(items[0], items[1], items[2], items[3], items[4]).WithHeaders("Accept").WithMethods("GET"));
-               options.AddPolicy("Review",
+               options.AddPolicy("Preview",
                   builder => builder.WithOrigins(items[0], items[1], items[2], items[3], items[4]).WithHeaders("Accept").WithMethods("GET"));
                options.AddPolicy("Schedule",
                   builder => builder.WithOrigins(items[0], items[1], items[2], items[3], items[4]).WithHeaders("Accept").WithMethods("GET"));
