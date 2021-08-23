@@ -90,12 +90,14 @@ namespace orderAPi.Models
             var deviceJson = JsonSerializer.Deserialize<Dictionary<string, object>>(deviceinfo);
             var requiredJson = JsonSerializer.Deserialize<Dictionary<string, object>>(requiredinfo);
             var randomJson = new UserinfoClass().checkRandom(clientJson);
+            DateTime datetime = DateTime.Now;
+            string nowdate = datetime.ToString("yyyy/MM/dd"), nowtime = datetime.ToString("HH:mm:ss");
             List<dbparam> dbparams = new List<dbparam>();
             dbparams.Add(new dbparam("@newid", new sha256().encry256($"{clientJson["clientid"].ToString().TrimEnd()}{randomJson["random"].ToString().TrimEnd()}{clientJson["accesstoken"].ToString().TrimEnd()}")));
             dbparams.Add(new dbparam("@orderid", requiredJson["orderid"].ToString().TrimEnd()));
             if (new database().checkActiveSql("mssql", "eatingstring", "exec eat.closebusiness @newid,@orderid;", dbparams) != "istrue")
                 return new Dictionary<string, object>() { };
-            return new Dictionary<string, object>() { { "time", "0 secs" } };
+            return new Dictionary<string, object>() { { "time", new datetime().differentimeAbs($"{nowdate} {nowtime}") } };
         }
 
         public Dictionary<string, object> GetOpenedModels(string clientinfo, string deviceinfo, string requiredinfo, string timeinfo, string cuurip)
@@ -136,6 +138,22 @@ namespace orderAPi.Models
             if (new database().checkActiveSql("mssql", "eatingstring", "exec eat.waitbusiness @newid,@orderid,@addate,@ontime;", dbparams) != "istrue")
                 return new Dictionary<string, object>() { };
             return new Dictionary<string, object>() { { "time", datetime.differentimeAbs($"{nowdate} {nowtime}") } };
+        }
+
+        public Dictionary<string, object> GetRestartModels(string clientinfo, string deviceinfo, string requiredinfo, string cuurip)
+        {
+            var clientJson = JsonSerializer.Deserialize<Dictionary<string, object>>(clientinfo);
+            var deviceJson = JsonSerializer.Deserialize<Dictionary<string, object>>(deviceinfo);
+            var requiredJson = JsonSerializer.Deserialize<Dictionary<string, object>>(requiredinfo);
+            var randomJson = new UserinfoClass().checkRandom(clientJson);
+             DateTime datetime = DateTime.Now;
+            string nowdate = datetime.ToString("yyyy/MM/dd"), nowtime = datetime.ToString("HH:mm:ss");
+            List<dbparam> dbparams = new List<dbparam>();
+            dbparams.Add(new dbparam("@newid", new sha256().encry256($"{clientJson["clientid"].ToString().TrimEnd()}{randomJson["random"].ToString().TrimEnd()}{clientJson["accesstoken"].ToString().TrimEnd()}")));
+            dbparams.Add(new dbparam("@orderid", requiredJson["orderid"].ToString().TrimEnd()));
+            if (new database().checkActiveSql("mssql", "eatingstring", "exec eat.restartbusiness @newid,@orderid;", dbparams) != "istrue")
+                return new Dictionary<string, object>() { };
+            return new Dictionary<string, object>() { { "time", new datetime().differentimeAbs($"{nowdate} {nowtime}") } };
         }
 
         public bool GetDeleteModels(string clientinfo, string deviceinfo, string requiredinfo, string cuurip)

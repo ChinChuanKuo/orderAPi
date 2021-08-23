@@ -75,6 +75,16 @@ namespace orderAPi.Controllers
             return shopClass;
         }
 
+        [HttpPost]
+        [Route("restartData")]
+        public ActionResult<Dictionary<string, object>> restartData([FromForm] string clientinfo, [FromForm] string deviceinfo, [FromForm] string requiredinfo)
+        {
+            string clientip = Request.HttpContext.Connection.RemoteIpAddress.ToString().TrimEnd() == "::1" ? "127.0.0.1" : Request.HttpContext.Connection.RemoteIpAddress.ToString().TrimEnd();
+            var shopClass = new ShopClass().GetRestartModels(clientinfo, deviceinfo, requiredinfo, clientip);
+            if (shopClass.Count == 0) return NotFound();
+            return shopClass;
+        }
+
 
         [HttpPost]
         [Route("deleteData")]
