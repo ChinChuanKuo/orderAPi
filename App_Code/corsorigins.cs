@@ -7,7 +7,7 @@ namespace orderAPi.App_Code
     {
         public string[] connectionString()
         {
-            var configurationBuilder = new ConfigurationBuilder().SetBasePath(new database().connectionSystem()).AddJsonFile("connectionAPi.json");
+            var configurationBuilder = new ConfigurationBuilder().SetBasePath(new database().connectionSystem()).AddJsonFile("orderAPi.json");
             List<configitem> originitems = configurationBuilder.Build().Get<originString>().corsoriginStrings;
             int i  = 0, total = originitems.Count;
             string[] items = new string[total];
