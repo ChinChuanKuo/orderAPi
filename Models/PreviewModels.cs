@@ -6,7 +6,7 @@ using orderAPi.App_Code;
 
 namespace orderAPi.Models
 {
-    public class ReviewClass
+    public class PreviewClass
     {
         public Dictionary<string, object> GetSearchModels(string clientinfo, string deviceinfo, string cuurip)
         {
