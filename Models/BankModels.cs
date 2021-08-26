@@ -21,13 +21,24 @@ namespace orderAPi.Models
             var deviceJson = JsonSerializer.Deserialize<Dictionary<string, object>>(deviceinfo);
             var dateJson = JsonSerializer.Deserialize<Dictionary<string, object>>(dateinfo);
             var randomJson = new UserinfoClass().checkRandom(clientJson);
+            database database = new database();
             List<dbparam> dbparams = new List<dbparam>();
             dbparams.Add(new dbparam("@stdate", DateTime.Parse(dateJson["stdate"].ToString().TrimEnd()).ToString("yyyy/MM/dd")));
             dbparams.Add(new dbparam("@endate", DateTime.Parse(dateJson["endate"].ToString().TrimEnd()).ToString("yyyy/MM/dd")));
             List<Dictionary<string, object>> items = new List<Dictionary<string, object>>();
-            foreach (DataRow dr in new database().checkSelectSql("mssql", "eatingstring", "eat.bankstoreform @stdate,@endate;", dbparams).Rows)
+            foreach (DataRow dr in database.checkSelectSql("mssql", "eatingstring", "eat.bankstoreform @stdate,@endate;", dbparams).Rows)
             {
-                items.Add(new Dictionary<string, object>() { { "money", JsonSerializer.Deserialize<Dictionary<string, object>>(dr["store"].ToString().TrimEnd()) }, { "requireid", new Dictionary<string, object>() { { "orderid", dr["storeid"].ToString().TrimEnd() } } }, { "client", new Dictionary<string, object>() { { "clientid", dr["clientid"].ToString().TrimEnd() }, { "accesstoken", dr["accesstoken"].ToString().TrimEnd() }, { "email", dr["email"].ToString().TrimEnd() } } }, { "stdate", new Dictionary<string, object>() { { "data", $"{dr["indate"].ToString().TrimEnd().Replace('/', '-')} {dr["intime"].ToString().TrimEnd()}" } } }, { "endate", new Dictionary<string, object>() { { "data", $"{dr["indate"].ToString().TrimEnd().Replace('/', '-')} {dr["intime"].ToString().TrimEnd()}" } } }, { "success", dr["status"].ToString().TrimEnd() == "1" }, { "failed", dr["status"].ToString().TrimEnd() == "2" } });
+                var money = JsonSerializer.Deserialize<Dictionary<string, object>>(dr["store"].ToString().TrimEnd());
+                dbparams.Clear();
+                dbparams.Add(new dbparam("@clientid", dr["clientid"].ToString().TrimEnd()));
+                dbparams.Add(new dbparam("@accesstoken", dr["accesstoken"].ToString().TrimEnd()));
+                dbparams.Add(new dbparam("@category", money["category"].ToString().TrimEnd()));
+                dbparams.Add(new dbparam("@stdate", DateTime.Parse(dateJson["stdate"].ToString().TrimEnd()).ToString("yyyy/MM/dd")));
+                dbparams.Add(new dbparam("@endate", DateTime.Parse(dateJson["endate"].ToString().TrimEnd()).ToString("yyyy/MM/dd")));
+                foreach (DataRow row in database.checkSelectSql("mssql", "eatingstring", "exec eat.bankinfoform @clientid,@accesstoken,@category,@stdate,@endate;", dbparams).Rows)
+                {
+                    items.Add(new Dictionary<string, object>() { { "money", money }, { "requireid", new Dictionary<string, object>() { { "orderid", row["storeid"].ToString().TrimEnd() } } }, { "client", new Dictionary<string, object>() { { "clientid", dr["clientid"].ToString().TrimEnd() }, { "accesstoken", dr["accesstoken"].ToString().TrimEnd() }, { "email", dr["email"].ToString().TrimEnd() } } }, { "stdate", new Dictionary<string, object>() { { "data", $"{row["indate"].ToString().TrimEnd().Replace('/', '-')} {row["intime"].ToString().TrimEnd()}" } } }, { "endate", new Dictionary<string, object>() { { "data", $"{row["indate"].ToString().TrimEnd().Replace('/', '-')} {row["intime"].ToString().TrimEnd()}" } } }, { "success", dr["status"].ToString().TrimEnd() == "1" }, { "failed", dr["status"].ToString().TrimEnd() == "2" } });
+                }
             }
             return items;
         }
