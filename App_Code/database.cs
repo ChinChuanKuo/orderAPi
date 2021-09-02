@@ -13,8 +13,6 @@ namespace orderAPi.App_Code
     {
         public string connectionString(string sqlstring)
         {
-            //C:/
-            ///users/chinchuankuo/documents/
             var configurationBuilder = new ConfigurationBuilder().SetBasePath(connectionSystem()).AddJsonFile("connection.json");
             IConfiguration config = configurationBuilder.Build();
             return config[$"connectionStrings:{sqlstring}"];

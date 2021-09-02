@@ -13,13 +13,12 @@ namespace orderAPi.Models
             var clientJson = JsonSerializer.Deserialize<Dictionary<string, object>>(clientinfo);
             var deviceJson = JsonSerializer.Deserialize<Dictionary<string, object>>(deviceinfo);
             var randomJson = new UserinfoClass().checkRandom(clientJson);
-            datetime datetime = new datetime();
             DataTable mainRows = new DataTable();
             mainRows = new database().checkSelectSql("mssql", "eatingstring", "exec eat.orderestaurant;", new List<dbparam>());
             switch (mainRows.Rows.Count)
             {
                 case 0:
-                    return new Dictionary<string, object>() { { "shop", new Dictionary<string, object>() { { "category", new Dictionary<string, object>() { { "requireid", new Dictionary<string, object>() { { "orderid", "" } } }, { "shop", new Dictionary<string, object>() { { "name", "" }, { "phone", "" }, { "address", "" } } } } }, { "ordered", false }, { "items", new List<Dictionary<string, object>>() { } } } }, { "time", "" }, { "opened", false }, { "closed", false } };
+                    return new Dictionary<string, object>() { { "shop", new Dictionary<string, object>() { { "category", new Dictionary<string, object>() { { "requireid", new Dictionary<string, object>() { { "orderid", "" } } }, { "shop", new Dictionary<string, object>() { { "name", "" }, { "phone", "" }, { "address", "" } } } } }, { "ordered", false }, { "items", new List<Dictionary<string, object>>() { } } } }, { "time", new Dictionary<string, object>() { { "data", "" } } }, { "opened", false }, { "closed", false } };
             }
             List<Dictionary<string, object>> items = new List<Dictionary<string, object>>();
             foreach (DataRow dr in mainRows.Rows)
@@ -27,8 +26,8 @@ namespace orderAPi.Models
                 items.Add(new Dictionary<string, object>() { { "menu", JsonSerializer.Deserialize<Dictionary<string, object>>(dr["menu"].ToString().TrimEnd()) }, { "requireid", new Dictionary<string, object>() { { "orderid", $"{dr["orderid"].ToString().TrimEnd()}{dr["iid"].ToString().TrimEnd()}" } } } });
             }
             string ondate = $"{mainRows.Rows[0]["ondate"].ToString().TrimEnd()} {mainRows.Rows[0]["ontime"].ToString().TrimEnd()}".TrimEnd(), endate = $"{mainRows.Rows[0]["endate"].ToString().TrimEnd()} {mainRows.Rows[0]["entime"].ToString().TrimEnd()}".TrimEnd();
-            bool[] business = datetime.checkedBusiness(ondate, endate);
-            return new Dictionary<string, object>() { { "shop", new Dictionary<string, object>() { { "category", new Dictionary<string, object>() { { "requireid", new Dictionary<string, object>() { { "orderid", mainRows.Rows[0]["orderid"].ToString().TrimEnd() } } }, { "shop", JsonSerializer.Deserialize<Dictionary<string, object>>(mainRows.Rows[0]["shop"].ToString().TrimEnd()) } } }, { "ordered", false }, { "items", items } } }, { "time", datetime.differentimeAbs(business[1] ? endate : ondate) }, { "opened", business[0] }, { "closed", business[1] } };
+            bool[] business = new datetime().checkedBusiness(ondate, endate);
+            return new Dictionary<string, object>() { { "shop", new Dictionary<string, object>() { { "category", new Dictionary<string, object>() { { "requireid", new Dictionary<string, object>() { { "orderid", mainRows.Rows[0]["orderid"].ToString().TrimEnd() } } }, { "shop", JsonSerializer.Deserialize<Dictionary<string, object>>(mainRows.Rows[0]["shop"].ToString().TrimEnd()) } } }, { "ordered", false }, { "items", items } } }, { "time", new Dictionary<string, object>() { { "data", new abstime().differentime(business[1] ? endate : ondate) } } }, { "opened", business[0] }, { "closed", business[1] } };
         }
 
         public List<Dictionary<string, object>> GetSearchModels(string clientinfo, string deviceinfo, string cuurip)
@@ -95,7 +94,7 @@ namespace orderAPi.Models
             dbparams.Add(new dbparam("@orderid", requiredJson["orderid"].ToString().TrimEnd()));
             if (new database().checkActiveSql("mssql", "eatingstring", "exec eat.closebusiness @newid,@orderid;", dbparams) != "istrue")
                 return new Dictionary<string, object>() { };
-            return new Dictionary<string, object>() { { "time", new datetime().differentimeAbs($"{nowdate} {nowtime}") } };
+            return new Dictionary<string, object>() { { "data", new abstime().differentime($"{nowdate} {nowtime}") } };
         }
 
         public Dictionary<string, object> GetOpenedModels(string clientinfo, string deviceinfo, string requiredinfo, string timeinfo, string cuurip)
@@ -107,7 +106,7 @@ namespace orderAPi.Models
             var randomJson = new UserinfoClass().checkRandom(clientJson);
             datetime datetime = new datetime();
             string nowdate = DateTime.Now.ToString("yyyy/MM/dd"), nowtime = DateTime.Parse(timeJson["data"].ToString().TrimEnd()).ToString("HH:mm:ss");
-            int addate = datetime.differentimeInt($"{nowdate} {nowtime}");
+            int addate = datetime.differtime($"{nowdate} {nowtime}");
             List<dbparam> dbparams = new List<dbparam>();
             dbparams.Add(new dbparam("@newid", new sha256().encry256($"{clientJson["clientid"].ToString().TrimEnd()}{randomJson["random"].ToString().TrimEnd()}{clientJson["accesstoken"].ToString().TrimEnd()}")));
             dbparams.Add(new dbparam("@orderid", requiredJson["orderid"].ToString().TrimEnd()));
@@ -125,9 +124,8 @@ namespace orderAPi.Models
             var requiredJson = JsonSerializer.Deserialize<Dictionary<string, object>>(requiredinfo);
             var timeJson = JsonSerializer.Deserialize<Dictionary<string, object>>(timeinfo);
             var randomJson = new UserinfoClass().checkRandom(clientJson);
-            datetime datetime = new datetime();
             string nowdate = DateTime.Now.ToString("yyyy/MM/dd"), nowtime = DateTime.Parse(timeJson["data"].ToString().TrimEnd()).ToString("HH:mm:ss");
-            int addate = datetime.differentimeInt($"{nowdate} {nowtime}");
+            int addate = new datetime().differtime($"{nowdate} {nowtime}");
             List<dbparam> dbparams = new List<dbparam>();
             dbparams.Add(new dbparam("@newid", new sha256().encry256($"{clientJson["clientid"].ToString().TrimEnd()}{randomJson["random"].ToString().TrimEnd()}{clientJson["accesstoken"].ToString().TrimEnd()}")));
             dbparams.Add(new dbparam("@orderid", requiredJson["orderid"].ToString().TrimEnd()));
@@ -135,7 +133,7 @@ namespace orderAPi.Models
             dbparams.Add(new dbparam("@ontime", nowtime));
             if (new database().checkActiveSql("mssql", "eatingstring", "exec eat.waitbusiness @newid,@orderid,@addate,@ontime;", dbparams) != "istrue")
                 return new Dictionary<string, object>() { };
-            return new Dictionary<string, object>() { { "time", datetime.differentimeAbs($"{nowdate} {nowtime}") } };
+            return new Dictionary<string, object>() { { "data", new abstime().differentime($"{nowdate} {nowtime}") } };
         }
 
         public Dictionary<string, object> GetRestartModels(string clientinfo, string deviceinfo, string requiredinfo, string cuurip)
@@ -151,7 +149,7 @@ namespace orderAPi.Models
             dbparams.Add(new dbparam("@orderid", requiredJson["orderid"].ToString().TrimEnd()));
             if (new database().checkActiveSql("mssql", "eatingstring", "exec eat.restartbusiness @newid,@orderid;", dbparams) != "istrue")
                 return new Dictionary<string, object>() { };
-            return new Dictionary<string, object>() { { "time", new datetime().differentimeAbs($"{nowdate} {nowtime}") } };
+            return new Dictionary<string, object>() { { "data", new abstime().differentime($"{nowdate} {nowtime}") } };
         }
 
         public bool GetDeleteModels(string clientinfo, string deviceinfo, string requiredinfo, string cuurip)

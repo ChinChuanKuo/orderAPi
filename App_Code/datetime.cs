@@ -35,9 +35,10 @@ namespace orderAPi.App_Code
             }
         }
 
-        public string differentime(string beforedate)
+        public virtual string differentime(string begindate)
         {
-            DateTime beforeDate = DateTime.Parse(beforedate), nowDate = DateTime.Now;
+            DateTime beforeDate = DateTime.Parse(begindate), 
+            nowDate = DateTime.Now;
             TimeSpan ts = nowDate.Subtract(beforeDate);
             switch (ts.Days)
             {
@@ -60,35 +61,14 @@ namespace orderAPi.App_Code
         public bool[] checkedBusiness(string ondate, string endate)
         {
             if (endate == "")
-                return new bool[] { differentimeInt(ondate) >= 0, false };
+                return new bool[] { differtime(ondate) >= 0, false };
             return new bool[] { false, true };
         }
 
-        public string differentimeAbs(string beforedate)
+        public int differtime(string begindate)
         {
-            DateTime beforeDate = DateTime.Parse(beforedate), nowDate = DateTime.Now;
-            TimeSpan ts = nowDate.Subtract(beforeDate);
-            switch (ts.Days)
-            {
-                case 0:
-                    switch (ts.Hours)
-                    {
-                        case 0:
-                            switch (ts.Minutes)
-                            {
-                                case 0:
-                                    return $"{Math.Abs(ts.Seconds)} sec";
-                            }
-                            return $"{Math.Abs(ts.Minutes)} min";
-                    }
-                    return $"{Math.Abs(ts.Hours)} hr";
-            }
-            return $"{Math.Abs(ts.Days)} d";
-        }
-
-        public int differentimeInt(string beforedate)
-        {
-            DateTime beforeDate = DateTime.Parse(beforedate), nowDate = DateTime.Now;
+            DateTime beforeDate = DateTime.Parse(begindate),
+            nowDate = DateTime.Now;
             TimeSpan ts = nowDate.Subtract(beforeDate);
             switch (ts.Days)
             {
@@ -106,6 +86,32 @@ namespace orderAPi.App_Code
                     return ts.Hours;
             }
             return ts.Days;
+        }
+    }
+
+    public class abstime : datetime
+    {
+        public override string differentime(string begindate)
+        {
+            DateTime beforeDate = DateTime.Parse(begindate),
+            nowDate = DateTime.Now;
+            TimeSpan ts = nowDate.Subtract(beforeDate);
+            switch (ts.Days)
+            {
+                case 0:
+                    switch (ts.Hours)
+                    {
+                        case 0:
+                            switch (ts.Minutes)
+                            {
+                                case 0:
+                                    return $"{Math.Abs(ts.Seconds)} sec";
+                            }
+                            return $"{Math.Abs(ts.Minutes)} min";
+                    }
+                    return $"{Math.Abs(ts.Hours)} hr";
+            }
+            return $"{Math.Abs(ts.Days)} d";
         }
     }
 }

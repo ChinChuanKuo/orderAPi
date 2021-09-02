@@ -25,7 +25,7 @@ namespace orderAPi.Models
             List<Dictionary<string, object>> items = new List<Dictionary<string, object>>();
             foreach (DataRow dr in new database().checkSelectSql("mssql", "eatingstring", "exec eat.previewcheckout @newid;", dbparams).Rows)
             {
-                items.Add(new Dictionary<string, object>() { { "requireid", new Dictionary<string, object>() { { "orderid", $"{dr["orderid"].ToString().TrimEnd()}{dr["iid"].ToString().TrimEnd()}" } } }, { "menu", JsonSerializer.Deserialize<Dictionary<string, object>>(dr["menu"].ToString().TrimEnd()) }, { "client", new Dictionary<string, object>() { { "clientid", dr["clientid"].ToString().TrimEnd() }, { "accesstoken", dr["accesstoken"].ToString().TrimEnd() }, { "email", dr["signdata"].ToString().TrimEnd() } } } });
+                items.Add(new Dictionary<string, object>() { { "menu", new Dictionary<string, object>() { { "requireid", new Dictionary<string, object>() { { "orderid", $"{dr["orderid"].ToString().TrimEnd()}{dr["iid"].ToString().TrimEnd()}" } } }, { "menu", JsonSerializer.Deserialize<Dictionary<string, object>>(dr["menu"].ToString().TrimEnd()) } } }, { "client", new Dictionary<string, object>() { { "clientid", dr["clientid"].ToString().TrimEnd() }, { "accesstoken", dr["accesstoken"].ToString().TrimEnd() }, { "email", dr["signdata"].ToString().TrimEnd() } } } });
             }
             return new Dictionary<string, object>() { { "item", item }, { "items", items } };
         }

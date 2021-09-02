@@ -10,12 +10,28 @@ namespace orderAPi.Controllers
     [Route("[controller]")]
     public class MenuController : Controller
     {
-        [HttpPost]
+        [HttpGet]
+        [Route("officeData")]
+        public Dictionary<string, object> officeData(string clientinfo, string deviceinfo)
+        {
+            string clientip = Request.HttpContext.Connection.RemoteIpAddress.ToString().TrimEnd() == "::1" ? "127.0.0.1" : Request.HttpContext.Connection.RemoteIpAddress.ToString().TrimEnd();
+            return new MenuClass().GetOfficeModels(clientinfo, deviceinfo, clientip);
+        }
+
+        [HttpGet]
         [Route("searchData")]
-        public Dictionary<string, object> searchData([FromForm] string clientinfo, [FromForm] string deviceinfo)
+        public Dictionary<string, object> searchData(string clientinfo, string deviceinfo)
         {
             string clientip = Request.HttpContext.Connection.RemoteIpAddress.ToString().TrimEnd() == "::1" ? "127.0.0.1" : Request.HttpContext.Connection.RemoteIpAddress.ToString().TrimEnd();
             return new MenuClass().GetSearchModels(clientinfo, deviceinfo, clientip);
+        }
+
+        [HttpGet]
+        [Route("orderData")]
+        public List<Dictionary<string, object>> orderData(string clientinfo, string deviceinfo)
+        {
+            string clientip = Request.HttpContext.Connection.RemoteIpAddress.ToString().TrimEnd() == "::1" ? "127.0.0.1" : Request.HttpContext.Connection.RemoteIpAddress.ToString().TrimEnd();
+            return new MenuClass().GetOrderModels(clientinfo, deviceinfo, clientip);
         }
 
         [HttpPost]

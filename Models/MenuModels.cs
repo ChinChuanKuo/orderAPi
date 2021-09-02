@@ -1,5 +1,7 @@
+using System;
 using System.Collections.Generic;
 using System.Data;
+using System.Threading;
 using System.Text.Json;
 using orderAPi.App_Code;
 
@@ -7,6 +9,25 @@ namespace orderAPi.Models
 {
     public class MenuClass
     {
+        public Dictionary<string, object> GetOfficeModels(string clientinfo, string deviceinfo, string cuurip)
+        {
+            var clientJson = JsonSerializer.Deserialize<Dictionary<string, object>>(clientinfo);
+            var deviceJson = JsonSerializer.Deserialize<Dictionary<string, object>>(deviceinfo);
+            var randomJson = new UserinfoClass().checkRandom(clientJson);
+            List<dbparam> dbparams = new List<dbparam>();
+            dbparams.Add(new dbparam("@newid", new sha256().encry256($"{clientJson["clientid"].ToString().TrimEnd()}{randomJson["random"].ToString().TrimEnd()}{clientJson["accesstoken"].ToString().TrimEnd()}")));
+            dbparams.Add(new dbparam("@month", DateTime.Now.ToString("MM")));
+            Dictionary<string, object> item = new Dictionary<string, object>();
+            foreach (DataRow dr in new database().checkSelectSql("mssql", "eatingstring", "exec eat.officemenuform @newid,@month;", dbparams).Rows)
+            {
+                if (item.Count == 0)
+                    item.Add("data", dr["username"].ToString().TrimEnd());
+                else
+                    item["data"] += $" / {dr["username"].ToString().TrimEnd()}";
+            }
+            return item;
+        }
+
         public Dictionary<string, object> GetSearchModels(string clientinfo, string deviceinfo, string cuurip)
         {
             var clientJson = JsonSerializer.Deserialize<Dictionary<string, object>>(clientinfo);
@@ -15,7 +36,7 @@ namespace orderAPi.Models
             DataTable mainRows = new DataTable();
             List<dbparam> dbparams = new List<dbparam>();
             dbparams.Add(new dbparam("@newid", new sha256().encry256($"{clientJson["clientid"].ToString().TrimEnd()}{randomJson["random"].ToString().TrimEnd()}{clientJson["accesstoken"].ToString().TrimEnd()}")));
-            mainRows = new database().checkSelectSql("mssql", "eatingstring", "exec eat.ordermenuform @newid;", dbparams);
+            mainRows = new database().checkSelectSql("mssql", "eatingstring", "exec eat.searchmenuform @newid;", dbparams);
             switch (mainRows.Rows.Count)
             {
                 case 0:
@@ -26,7 +47,23 @@ namespace orderAPi.Models
             {
                 items.Add(new Dictionary<string, object>() { { "requireid", new Dictionary<string, object>() { { "orderid", $"{dr["orderid"].ToString().TrimEnd()}{dr["iid"].ToString().TrimEnd()}" } } }, { "menu", JsonSerializer.Deserialize<Dictionary<string, object>>(dr["menu"].ToString().TrimEnd()) }, { "ordered", dr["ordered"].ToString().TrimEnd() == "1" }, { "action", new Dictionary<string, object>() { { "inserted", false }, { "modified", false }, { "deleted", dr["ordered"].ToString().TrimEnd() == "1" } } } });
             }
-            return new Dictionary<string, object>() { { "shop", JsonSerializer.Deserialize<Dictionary<string, object>>(mainRows.Rows[0]["shop"].ToString().TrimEnd()) }, { "items", items }, { "closed", !string.IsNullOrWhiteSpace(mainRows.Rows[0]["endate"].ToString().TrimEnd()) } };
+            return new Dictionary<string, object>() { { "shop", JsonSerializer.Deserialize<Dictionary<string, object>>(mainRows.Rows[0]["shop"].ToString().TrimEnd()) }, { "items", items }, { "closed", mainRows.Rows[0]["endate"].ToString().TrimEnd() != "" } };
+        }
+
+        public List<Dictionary<string, object>> GetOrderModels(string clientinfo, string deviceinfo, string cuurip)
+        {
+            var clientJson = JsonSerializer.Deserialize<Dictionary<string, object>>(clientinfo);
+            var deviceJson = JsonSerializer.Deserialize<Dictionary<string, object>>(deviceinfo);
+            var randomJson = new UserinfoClass().checkRandom(clientJson);
+            DataTable mainRows = new DataTable();
+            List<dbparam> dbparams = new List<dbparam>();
+            dbparams.Add(new dbparam("@newid", new sha256().encry256($"{clientJson["clientid"].ToString().TrimEnd()}{randomJson["random"].ToString().TrimEnd()}{clientJson["accesstoken"].ToString().TrimEnd()}")));
+            List<Dictionary<string, object>> items = new List<Dictionary<string, object>>();
+            foreach (DataRow dr in new database().checkSelectSql("mssql", "eatingstring", "exec eat.ordermenuform @newid;", dbparams).Rows)
+            {
+                items.Add(new Dictionary<string, object>() { { "requireid", new Dictionary<string, object>() { { "orderid", $"{dr["orderid"].ToString().TrimEnd()}{dr["iid"].ToString().TrimEnd()}" } } }, { "menu", JsonSerializer.Deserialize<Dictionary<string, object>>(dr["menu"].ToString().TrimEnd()) }, { "ordered", dr["ordered"].ToString().TrimEnd() == "1" }, { "action", new Dictionary<string, object>() { { "inserted", false }, { "modified", false }, { "deleted", dr["ordered"].ToString().TrimEnd() == "1" } } } });
+            }
+            return items;
         }
 
         public bool GetInsertModels(string clientinfo, string deviceinfo, string menuinfo, string cuurip)
@@ -64,6 +101,7 @@ namespace orderAPi.Models
                         }
                         break;
                 }
+                Thread.Sleep(1000);
             }
             return true;
         }

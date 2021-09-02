@@ -37,13 +37,13 @@ namespace orderAPi
                options.AddPolicy("History",
                   builder => builder.WithOrigins(items[0], items[1], items[2], items[3], items[4]).WithHeaders("Accept").WithMethods("GET"));
                options.AddPolicy("Menu",
-                  builder => builder.WithOrigins(items[0], items[1], items[2], items[3], items[4]).WithHeaders("Accept").WithMethods("POST"));
+                  builder => builder.WithOrigins(items[0], items[1], items[2], items[3], items[4]).WithHeaders("Accept").WithMethods("GET", "POST"));
                options.AddPolicy("Money",
                   builder => builder.WithOrigins(items[0], items[1], items[2], items[3], items[4]).WithHeaders("Accept").WithMethods("GET"));
                options.AddPolicy("Notifications",
                   builder => builder.WithOrigins(items[0], items[1], items[2], items[3], items[4]).WithHeaders("Accept").WithMethods("GET"));
                options.AddPolicy("Office",
-                  builder => builder.WithOrigins(items[0], items[1], items[2], items[3], items[4]).WithHeaders("Accept").WithMethods("POST"));
+                  builder => builder.WithOrigins(items[0], items[1], items[2], items[3], items[4]).WithHeaders("Accept").WithMethods("GET", "POST"));
                options.AddPolicy("Order",
                   builder => builder.WithOrigins(items[0], items[1], items[2], items[3], items[4]).WithHeaders("Accept").WithMethods("GET"));
                options.AddPolicy("Profile",
