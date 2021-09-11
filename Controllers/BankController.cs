@@ -27,7 +27,6 @@ namespace orderAPi.Controllers
             return new BankClass().GetSearchModels(clientinfo, deviceinfo, dateinfo, clientip);
         }
 
-
         [HttpGet]
         [Route("statistData")]
         public List<Dictionary<string, object>> statistData(string clientinfo, string deviceinfo)

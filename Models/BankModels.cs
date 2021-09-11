@@ -26,7 +26,7 @@ namespace orderAPi.Models
             dbparams.Add(new dbparam("@stdate", DateTime.Parse(dateJson["stdate"].ToString().TrimEnd()).ToString("yyyy/MM/dd")));
             dbparams.Add(new dbparam("@endate", DateTime.Parse(dateJson["endate"].ToString().TrimEnd()).ToString("yyyy/MM/dd")));
             List<Dictionary<string, object>> items = new List<Dictionary<string, object>>();
-            foreach (DataRow dr in database.checkSelectSql("mssql", "eatingstring", "eat.bankstoreform @stdate,@endate;", dbparams).Rows)
+            foreach (DataRow dr in database.checkSelectSql("mssql", "eatingstring", "exec eat.bankstoreform @stdate,@endate;", dbparams).Rows)
             {
                 var money = JsonSerializer.Deserialize<Dictionary<string, object>>(dr["store"].ToString().TrimEnd());
                 dbparams.Clear();

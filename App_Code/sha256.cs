@@ -7,10 +7,11 @@ namespace orderAPi.App_Code
 {
     public class sha256
     {
-        public string encry256(string password)
+        public string encry256(string encry)
         {
+            if (string.IsNullOrWhiteSpace(encry)) return "";
             SHA256 sha256 = new SHA256CryptoServiceProvider();
-            return Convert.ToBase64String(sha256.ComputeHash(Encoding.Default.GetBytes(password.TrimEnd())));
+            return Convert.ToBase64String(sha256.ComputeHash(Encoding.Default.GetBytes(encry.TrimEnd())));
         }
 
         public string new256(string dataname, string sqlstring)

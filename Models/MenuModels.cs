@@ -66,13 +66,20 @@ namespace orderAPi.Models
             return items;
         }
 
-        public bool GetInsertModels(string clientinfo, string deviceinfo, string menuinfo, string cuurip)
+        public Dictionary<string, object> GetInsertModels(string clientinfo, string deviceinfo, string menuinfo, string cuurip)
         {
             var clientJson = JsonSerializer.Deserialize<Dictionary<string, object>>(clientinfo);
             var deviceJson = JsonSerializer.Deserialize<Dictionary<string, object>>(deviceinfo);
             var menuJson = JsonSerializer.Deserialize<List<Dictionary<string, object>>>(menuinfo);
             var randomJson = new UserinfoClass().checkRandom(clientJson);
             string newid = new sha256().encry256($"{clientJson["clientid"].ToString().TrimEnd()}{randomJson["random"].ToString().TrimEnd()}{clientJson["accesstoken"].ToString().TrimEnd()}");
+            database database = new database();
+            List<dbparam> dbparams = new List<dbparam>();
+            dbparams.Add(new dbparam("@newid", newid));
+            if (database.checkSelectSql("mssql", "eatingstring", "exec eat.searchmenuform @newid;", dbparams).Rows[0]["endate"].ToString().TrimEnd() != "")
+                return new Dictionary<string, object>() { { "status", "closed" } };
+            if (!countOrder(menuJson, newid))
+                return new Dictionary<string, object>() { { "status", "enough" } };
             foreach (var menu in menuJson)
             {
                 var requiredJson = JsonSerializer.Deserialize<Dictionary<string, object>>(menu["requireid"].ToString().TrimEnd());
@@ -80,7 +87,7 @@ namespace orderAPi.Models
                 int orderLen = requiredJson["orderid"].ToString().TrimEnd().Length - 1;
                 string iid = requiredJson["orderid"].ToString().TrimEnd().Substring(orderLen),
                     orderid = requiredJson["orderid"].ToString().TrimEnd().Substring(0, orderLen);
-                List<dbparam> dbparams = new List<dbparam>();
+                dbparams = new List<dbparam>();
                 dbparams.Add(new dbparam("@newid", newid));
                 dbparams.Add(new dbparam("@iid", iid));
                 dbparams.Add(new dbparam("@orderid", orderid));
@@ -88,38 +95,61 @@ namespace orderAPi.Models
                 switch (bool.Parse(actionJson["inserted"].ToString().TrimEnd()))
                 {
                     case true:
-                        if (new database().checkActiveSql("mssql", "eatingstring", "exec eat.insertcheckout @newid,@iid,@orderid,@menu;", dbparams) != "istrue")
-                            return false;
+                        if (database.checkActiveSql("mssql", "eatingstring", "exec eat.insertcheckout @newid,@iid,@orderid,@menu;", dbparams) != "istrue")
+                            return new Dictionary<string, object>() { };
                         break;
                     default:
                         switch (bool.Parse(actionJson["modified"].ToString().TrimEnd()))
                         {
                             case true:
-                                if (new database().checkActiveSql("mssql", "eatingstring", "exec eat.updatecheckout @newid,@iid,@orderid,@menu;", dbparams) != "istrue")
-                                    return false;
+                                if (database.checkActiveSql("mssql", "eatingstring", "exec eat.updatecheckout @newid,@iid,@orderid,@menu;", dbparams) != "istrue")
+                                    return new Dictionary<string, object>() { };
                                 break;
                         }
                         break;
                 }
                 Thread.Sleep(1000);
             }
-            return true;
+            return new Dictionary<string, object>() { { "status", "istrue" } };
         }
 
-        public bool GetDeleteModels(string clientinfo, string deviceinfo, string requiredinfo, string cuurip)
+        public bool countOrder(List<Dictionary<string, object>> menuJson, string newid)
+        {
+            if (string.IsNullOrWhiteSpace(newid)) return false;
+            DataTable mainRows = new DataTable();
+            List<dbparam> dbparams = new List<dbparam>();
+            dbparams.Add(new dbparam("@newid", newid));
+            mainRows = new database().checkSelectSql("mssql", "eatingstring", "exec eat.checkwallet @newid;", dbparams);
+            if (mainRows.Rows.Count == 0) return false;
+            int count = 0;
+            foreach (var menu in menuJson)
+            {
+                var menuitem = JsonSerializer.Deserialize<Dictionary<string, object>>(menu["menu"].ToString().TrimEnd());
+                count += int.Parse(menuitem["price"].ToString().TrimEnd()) * int.Parse(menuitem["quantity"].ToString().TrimEnd());
+            }
+            return int.Parse(mainRows.Rows[0]["money"].ToString().TrimEnd()) >= count;
+        }
+
+        public Dictionary<string, object> GetDeleteModels(string clientinfo, string deviceinfo, string requiredinfo, string cuurip)
         {
             var clientJson = JsonSerializer.Deserialize<Dictionary<string, object>>(clientinfo);
             var deviceJson = JsonSerializer.Deserialize<Dictionary<string, object>>(deviceinfo);
             var requiredJson = JsonSerializer.Deserialize<Dictionary<string, object>>(requiredinfo);
             var randomJson = new UserinfoClass().checkRandom(clientJson);
+            string newid = new sha256().encry256($"{clientJson["clientid"].ToString().TrimEnd()}{randomJson["random"].ToString().TrimEnd()}{clientJson["accesstoken"].ToString().TrimEnd()}");
             int orderLen = requiredJson["orderid"].ToString().TrimEnd().Length - 1;
             string iid = requiredJson["orderid"].ToString().TrimEnd().Substring(orderLen),
                 orderid = requiredJson["orderid"].ToString().TrimEnd().Substring(0, orderLen);
+            database database = new database();
             List<dbparam> dbparams = new List<dbparam>();
-            dbparams.Add(new dbparam("@newid", new sha256().encry256($"{clientJson["clientid"].ToString().TrimEnd()}{randomJson["random"].ToString().TrimEnd()}{clientJson["accesstoken"].ToString().TrimEnd()}")));
+            dbparams.Add(new dbparam("@newid", newid));
+            if (database.checkSelectSql("mssql", "eatingstring", "exec eat.searchmenuform @newid;", dbparams).Rows[0]["endate"].ToString().TrimEnd() != "")
+                return new Dictionary<string, object>() { { "status", "closed" } };
             dbparams.Add(new dbparam("@orderid", orderid));
             dbparams.Add(new dbparam("@iid", iid));
-            return new database().checkActiveSql("mssql", "eatingstring", "exec eat.deletecheckout @newid,@orderid,@iid;", dbparams) == "istrue";
+            if (database.checkActiveSql("mssql", "eatingstring", "exec eat.deletecheckout @newid,@orderid,@iid;", dbparams) == "istrue")
+                return new Dictionary<string, object>() { { "status", "istrue" } };
+            return new Dictionary<string, object>() { };
         }
     }
 }
