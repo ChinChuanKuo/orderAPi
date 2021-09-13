@@ -225,5 +225,17 @@ namespace orderAPi.Models
             if (new database().checkActiveSql("mssql", "eatingstring", "exec eat.insertorderform @orderid,@shop,@newid;", dbparams) != "istrue") return new Dictionary<string, object>() { };
             return new Dictionary<string, object>() { { "requireid", new Dictionary<string, object>() { { "orderid", orderid } } }, { "shop", shopJson }, { "ordered", false }, { "items", new List<Dictionary<string, object>>() } };
         }
+
+        public bool GetRemoveModels(string clientinfo, string deviceinfo, string requiredinfo, string cuurip)
+        {
+            var clientJson = JsonSerializer.Deserialize<Dictionary<string, object>>(clientinfo);
+            var deviceJson = JsonSerializer.Deserialize<Dictionary<string, object>>(deviceinfo);
+            var requiredJson = JsonSerializer.Deserialize<Dictionary<string, object>>(requiredinfo);
+            var randomJson = new UserinfoClass().checkRandom(clientJson);
+            List<dbparam> dbparams = new List<dbparam>();
+            dbparams.Add(new dbparam("@newid", new sha256().encry256($"{clientJson["clientid"].ToString().TrimEnd()}{randomJson["random"].ToString().TrimEnd()}{clientJson["accesstoken"].ToString().TrimEnd()}")));
+            dbparams.Add(new dbparam("@orderid", requiredJson["orderid"].ToString().TrimEnd()));
+            return new database().checkActiveSql("mssql", "eatingstring", "exec eat.deleteshopform @newid,@orderid;", dbparams) == "istrue";
+        }
     }
 }

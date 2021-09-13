@@ -123,5 +123,15 @@ namespace orderAPi.Controllers
             if (shopClass.Count == 0) return NotFound();
             return shopClass;
         }
+
+        [HttpPost]
+        [Route("removeData")]
+        public ActionResult<bool> removeData([FromForm] string clientinfo, [FromForm] string deviceinfo, [FromForm] string requiredinfo)
+        {
+            string clientip = Request.HttpContext.Connection.RemoteIpAddress.ToString().TrimEnd() == "::1" ? "127.0.0.1" : Request.HttpContext.Connection.RemoteIpAddress.ToString().TrimEnd();
+            bool shopClass = new ShopClass().GetRemoveModels(clientinfo, deviceinfo, requiredinfo, clientip);
+            if (!shopClass) return NotFound();
+            return shopClass;
+        }
     }
 }
