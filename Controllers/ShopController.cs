@@ -133,5 +133,13 @@ namespace orderAPi.Controllers
             if (!shopClass) return NotFound();
             return shopClass;
         }
+
+        [HttpPost]
+        [Route("increaseData")]
+        public ActionResult<Dictionary<string, object>> increaseData([FromForm] string clientinfo, [FromForm] string deviceinfo, [FromForm] string requiredinfo, [FromForm] string iteminfo)
+        {
+            string clientip = Request.HttpContext.Connection.RemoteIpAddress.ToString().TrimEnd() == "::1" ? "127.0.0.1" : Request.HttpContext.Connection.RemoteIpAddress.ToString().TrimEnd();
+            return new ShopClass().GetIncreaseModels(clientinfo, deviceinfo, requiredinfo, iteminfo, clientip);
+        }
     }
 }

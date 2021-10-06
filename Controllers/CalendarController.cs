@@ -48,10 +48,10 @@ namespace orderAPi.Controllers
 
         [HttpPost]
         [Route("createData")]
-        public ActionResult<Dictionary<string, object>> createData([FromForm] string clientinfo, [FromForm] string deviceinfo, [FromForm] string categoryinfo, [FromForm] string datainfo, [FromForm] string timeinfo)
+        public ActionResult<Dictionary<string, object>> createData([FromForm] string clientinfo, [FromForm] string deviceinfo, [FromForm] string categoryinfo, [FromForm] string dateinfo, [FromForm] string timeinfo)
         {
             string clientip = Request.HttpContext.Connection.RemoteIpAddress.ToString().TrimEnd() == "::1" ? "127.0.0.1" : Request.HttpContext.Connection.RemoteIpAddress.ToString().TrimEnd();
-            var calendarClass = new CalendarClass().GetCreateModels(clientinfo, deviceinfo, categoryinfo, datainfo, timeinfo, clientip);
+            var calendarClass = new CalendarClass().GetCreateModels(clientinfo, deviceinfo, categoryinfo, dateinfo, timeinfo, clientip);
             if (calendarClass.Count == 0) return NotFound();
             return calendarClass;
         }

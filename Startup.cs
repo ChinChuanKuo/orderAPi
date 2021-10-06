@@ -34,8 +34,6 @@ namespace orderAPi
                   builder => builder.WithOrigins(items[0], items[1], items[2], items[3], items[4]).WithHeaders("Accept").WithMethods("GET", "POST"));
                options.AddPolicy("Calendar",
                   builder => builder.WithOrigins(items[0], items[1], items[2], items[3], items[4]).WithHeaders("Accept").WithMethods("GET", "POST"));
-               options.AddPolicy("History",
-                  builder => builder.WithOrigins(items[0], items[1], items[2], items[3], items[4]).WithHeaders("Accept").WithMethods("GET"));
                options.AddPolicy("Menu",
                   builder => builder.WithOrigins(items[0], items[1], items[2], items[3], items[4]).WithHeaders("Accept").WithMethods("GET", "POST"));
                options.AddPolicy("Money",
@@ -44,8 +42,6 @@ namespace orderAPi
                   builder => builder.WithOrigins(items[0], items[1], items[2], items[3], items[4]).WithHeaders("Accept").WithMethods("GET"));
                options.AddPolicy("Office",
                   builder => builder.WithOrigins(items[0], items[1], items[2], items[3], items[4]).WithHeaders("Accept").WithMethods("GET", "POST"));
-               options.AddPolicy("Order",
-                  builder => builder.WithOrigins(items[0], items[1], items[2], items[3], items[4]).WithHeaders("Accept").WithMethods("GET"));
                options.AddPolicy("Profile",
                   builder => builder.WithOrigins(items[0], items[1], items[2], items[3], items[4]).WithHeaders("Accept").WithMethods("GET"));
                options.AddPolicy("Preview",

@@ -16,11 +16,8 @@ namespace orderAPi.Models
             List<dbparam> dbparams = new List<dbparam>();
             dbparams.Add(new dbparam("@newid", new sha256().encry256($"{clientJson["clientid"].ToString().TrimEnd()}{randomJson["random"].ToString().TrimEnd()}{clientJson["accesstoken"].ToString().TrimEnd()}")));
             dbparams.Add(new dbparam("@externip", cuurip));
-            switch (new database().checkSelectSql("mssql", "eatingstring", "exec web.checkuserinfo @newid,@externip;", dbparams).Rows.Count)
-            {
-                case 0:
-                    return new userModels() { client = new Dictionary<string, object>() { { "clientid", "" }, { "accesstoken", "" } } };
-            }
+            if (new database().checkSelectSql("mssql", "eatingstring", "exec web.checkuserinfo @newid,@externip;", dbparams).Rows.Count == 0)
+                return new userModels() { client = new Dictionary<string, object>() { { "clientid", "" }, { "accesstoken", "" } } };
             return new userModels() { client = new Dictionary<string, object>() { { "clientid", clientJson["clientid"].ToString().TrimEnd() }, { "accesstoken", clientJson["accesstoken"].ToString().TrimEnd() }, { "email", "" } }, name = randomJson["username"].ToString().TrimEnd(), imageUrl = "https://images.unsplash.com/photo-1525253086316-d0c936c814f8" };
         }
 
@@ -33,11 +30,8 @@ namespace orderAPi.Models
             dbparams.Add(new dbparam("@newid", new sha256().encry256($"{clientJson["clientid"].ToString().TrimEnd()}{randomJson["random"].ToString().TrimEnd()}{clientJson["accesstoken"].ToString().TrimEnd()}")));
             dbparams.Add(new dbparam("@externip", cuurip));
             dbparams.Add(new dbparam("@month", DateTime.Now.ToString("MM")));
-            switch (new database().checkSelectSql("mssql", "eatingstring", "exec web.checkofficeinfo @newid,@externip,@month;", dbparams).Rows.Count)
-            {
-                case 0:
-                    return new userModels() { client = new Dictionary<string, object>() { { "clientid", "" }, { "accesstoken", "" } } };
-            }
+            if (new database().checkSelectSql("mssql", "eatingstring", "exec web.checkofficeinfo @newid,@externip,@month;", dbparams).Rows.Count == 0)
+                return new userModels() { client = new Dictionary<string, object>() { { "clientid", "" }, { "accesstoken", "" } } };
             return new userModels() { client = new Dictionary<string, object>() { { "clientid", clientJson["clientid"].ToString().TrimEnd() }, { "accesstoken", clientJson["accesstoken"].ToString().TrimEnd() }, { "email", "" } }, name = randomJson["username"].ToString().TrimEnd(), imageUrl = "https://images.unsplash.com/photo-1525253086316-d0c936c814f8" };
         }
 

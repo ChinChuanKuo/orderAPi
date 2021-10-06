@@ -19,9 +19,7 @@ namespace orderAPi.Models
             dbparams.Add(new dbparam("@endate", DateTime.Parse(dateJson["endate"].ToString().TrimEnd()).ToString("yyyy/MM/dd")));
             List<Dictionary<string, object>> items = new List<Dictionary<string, object>>();
             foreach (DataRow dr in new database().checkSelectSql("mssql", "eatingstring", "exec eat.calendarorder @stdate,@endate;", dbparams).Rows)
-            {
                 items.Add(new Dictionary<string, object>() { { "category", new Dictionary<string, object>() { { "requireid", new Dictionary<string, object>() { { "orderid", dr["orderid"].ToString().TrimEnd() } } }, { "shop", JsonSerializer.Deserialize<Dictionary<string, object>>(dr["shop"].ToString().TrimEnd()) } } }, { "stdate", new Dictionary<string, object>() { { "data", $"{dr["stdate"].ToString().TrimEnd().Replace('/', '-')} {dr["sttime"].ToString().TrimEnd()}" } } }, { "endate", new Dictionary<string, object>() { { "data", $"{dr["endate"].ToString().TrimEnd().Replace('/', '-')} {dr["entime"].ToString().TrimEnd()}" } } }, { "success", dr["status"].ToString().TrimEnd() == "0" }, { "failed", dr["status"].ToString().TrimEnd() == "2" } });
-            }
             return items;
         }
 
@@ -35,9 +33,7 @@ namespace orderAPi.Models
             dbparams.Add(new dbparam("@date", DateTime.Parse(dataJson["data"].ToString().TrimEnd()).ToString("yyyy/MM/dd")));
             List<Dictionary<string, object>> items = new List<Dictionary<string, object>>();
             foreach (DataRow dr in new database().checkSelectSql("mssql", "eatingstring", "exec eat.calendargroupform @date;", dbparams).Rows)
-            {
                 items.Add(new Dictionary<string, object>() { { "requireid", new Dictionary<string, object>() { { "orderid", dr["orderid"].ToString().TrimEnd() } } }, { "shop", JsonSerializer.Deserialize<Dictionary<string, object>>(dr["shop"].ToString().TrimEnd()) } });
-            }
             return items;
         }
 
@@ -78,16 +74,16 @@ namespace orderAPi.Models
             return new Dictionary<string, object>() { { "requireid", noquiredJson }, { "shop", JsonSerializer.Deserialize<Dictionary<string, object>>(categoryJson["shop"].ToString().TrimEnd()) }, { "stdate", new Dictionary<string, object>() { { "data", $"{nowdate.Replace('/', '-')} {nowtime}" } } }, { "endate", new Dictionary<string, object>() { { "data", $"{nowdate.Replace('/', '-')} {nowtime}" } } }, { "success", false }, { "failed", false } };
         }
 
-        public Dictionary<string, object> GetCreateModels(string clientinfo, string deviceinfo, string categoryinfo, string datainfo, string timeinfo, string cuurip)
+        public Dictionary<string, object> GetCreateModels(string clientinfo, string deviceinfo, string categoryinfo, string dateinfo, string timeinfo, string cuurip)
         {
             var clientJson = JsonSerializer.Deserialize<Dictionary<string, object>>(clientinfo);
             var deviceJson = JsonSerializer.Deserialize<Dictionary<string, object>>(deviceinfo);
             var categoryJson = JsonSerializer.Deserialize<Dictionary<string, object>>(categoryinfo);
-            var dataJson = JsonSerializer.Deserialize<Dictionary<string, object>>(datainfo);
+            var dateJson = JsonSerializer.Deserialize<Dictionary<string, object>>(dateinfo);
             var timeJson = JsonSerializer.Deserialize<Dictionary<string, object>>(timeinfo);
             var requiredJson = JsonSerializer.Deserialize<Dictionary<string, object>>(categoryJson["requireid"].ToString().TrimEnd());
             var randomJson = new UserinfoClass().checkRandom(clientJson);
-            string nowdate = DateTime.Parse(dataJson["data"].ToString().TrimEnd()).ToString("yyyy/MM/dd"), nowtime = DateTime.Parse(timeJson["data"].ToString().TrimEnd()).ToString("HH:mm:ss");
+            string nowdate = DateTime.Parse(dateJson["data"].ToString().TrimEnd()).ToString("yyyy/MM/dd"), nowtime = DateTime.Parse(timeJson["data"].ToString().TrimEnd()).ToString("HH:mm:ss");
             List<dbparam> dbparams = new List<dbparam>();
             dbparams.Add(new dbparam("@newid", new sha256().encry256($"{clientJson["clientid"].ToString().TrimEnd()}{randomJson["random"].ToString().TrimEnd()}{clientJson["accesstoken"].ToString().TrimEnd()}")));
             dbparams.Add(new dbparam("@orderid", requiredJson["orderid"].ToString().TrimEnd()));

@@ -58,9 +58,7 @@ namespace orderAPi.Models
             dbparams.Add(new dbparam("@month", DateTime.Parse(dataJson["data"].ToString().TrimEnd()).ToString("MM")));
             List<Dictionary<string, object>> items = new List<Dictionary<string, object>>();
             foreach (DataRow dr in new database().checkSelectSql("mssql", "eatingstring", "exec eat.searchoffice @newid,@month;", dbparams).Rows)
-            {
                 items.Add(new Dictionary<string, object>() { { "item", new Dictionary<string, object>() { { "data", dr["userid"].ToString().TrimEnd() } } }, { "client", new Dictionary<string, object>() { { "clientid", dr["clientid"].ToString().TrimEnd() }, { "accesstoken", dr["accesstoken"].ToString().TrimEnd() }, { "email", dr["username"].ToString().TrimEnd() } } }, { "action", new Dictionary<string, object>() { { "inserted", false }, { "modified", false }, { "deleted", true } } } });
-            }
             return items;
         }
 

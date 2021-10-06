@@ -33,5 +33,13 @@ namespace orderAPi.Controllers
             string clientip = Request.HttpContext.Connection.RemoteIpAddress.ToString().TrimEnd() == "::1" ? "127.0.0.1" : Request.HttpContext.Connection.RemoteIpAddress.ToString().TrimEnd();
             return new MoneyClass().GetStatistModels(clientinfo, deviceinfo, clientip);
         }
+
+        [HttpGet]
+        [Route("analysisData")]
+        public List<Dictionary<string, object>> analysisData(string clientinfo, string deviceinfo)
+        {
+            string clientip = Request.HttpContext.Connection.RemoteIpAddress.ToString().TrimEnd() == "::1" ? "127.0.0.1" : Request.HttpContext.Connection.RemoteIpAddress.ToString().TrimEnd();
+            return new MoneyClass().GetAnalysisModels(clientinfo, deviceinfo, clientip);
+        }
     }
 }

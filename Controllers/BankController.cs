@@ -35,9 +35,26 @@ namespace orderAPi.Controllers
             return new BankClass().GetStatistModels(clientinfo, deviceinfo, clientip);
         }
 
+        [HttpGet]
+        [Route("analysisData")]
+        public List<Dictionary<string, object>> analysisData(string clientinfo, string deviceinfo)
+        {
+            string clientip = Request.HttpContext.Connection.RemoteIpAddress.ToString().TrimEnd() == "::1" ? "127.0.0.1" : Request.HttpContext.Connection.RemoteIpAddress.ToString().TrimEnd();
+            return new BankClass().GetAnalysisModels(clientinfo, deviceinfo, clientip);
+        }
+
+
+        [HttpPost]
+        [Route("detailData")]
+        public List<Dictionary<string, object>> detailData([FromForm] string clientinfo, [FromForm] string deviceinfo, [FromForm] string requiredinfo, [FromForm] string datainfo, [FromForm] string dateinfo)
+        {
+            string clientip = Request.HttpContext.Connection.RemoteIpAddress.ToString().TrimEnd() == "::1" ? "127.0.0.1" : Request.HttpContext.Connection.RemoteIpAddress.ToString().TrimEnd();
+            return new BankClass().GetDetailModels(clientinfo, deviceinfo, requiredinfo, datainfo, dateinfo, clientip);
+        }
+
         [HttpPost]
         [Route("checkData")]
-        public ActionResult<Dictionary<string, object>> accessData([FromForm] string clientinfo, [FromForm] string deviceinfo, [FromForm] string infotext)
+        public ActionResult<Dictionary<string, object>> checkData([FromForm] string clientinfo, [FromForm] string deviceinfo, [FromForm] string infotext)
         {
             string clientip = Request.HttpContext.Connection.RemoteIpAddress.ToString().TrimEnd() == "::1" ? "127.0.0.1" : Request.HttpContext.Connection.RemoteIpAddress.ToString().TrimEnd();
             var bankClass = new BankClass().GetCheckModels(clientinfo, deviceinfo, infotext, clientip);
@@ -47,13 +64,22 @@ namespace orderAPi.Controllers
         }
 
         [HttpPost]
-        [Route("insertData")]
-        public ActionResult<Dictionary<string, object>> insertData([FromForm] string clientinfo, [FromForm] string deviceinfo, [FromForm] string notherinfo, [FromForm] string storetext)
+        [Route("storedData")]
+        public ActionResult<bool> storedData([FromForm] string clientinfo, [FromForm] string deviceinfo, [FromForm] string notherinfo, [FromForm] string storetext)
         {
             string clientip = Request.HttpContext.Connection.RemoteIpAddress.ToString().TrimEnd() == "::1" ? "127.0.0.1" : Request.HttpContext.Connection.RemoteIpAddress.ToString().TrimEnd();
-            var bankClass = new BankClass().GetInsertModels(clientinfo, deviceinfo, notherinfo, storetext, clientip);
-            if (bankClass.Count == 0)
-                return NotFound();
+            var bankClass = new BankClass().GetStoredModels(clientinfo, deviceinfo, notherinfo, storetext, clientip);
+            if (!bankClass) return NotFound();
+            return bankClass;
+        }
+
+        [HttpPost]
+        [Route("pickupData")]
+        public ActionResult<bool> pickupData([FromForm] string clientinfo, [FromForm] string deviceinfo, [FromForm] string notherinfo, [FromForm] string storetext)
+        {
+            string clientip = Request.HttpContext.Connection.RemoteIpAddress.ToString().TrimEnd() == "::1" ? "127.0.0.1" : Request.HttpContext.Connection.RemoteIpAddress.ToString().TrimEnd();
+            var bankClass = new BankClass().GetPickupModels(clientinfo, deviceinfo, notherinfo, storetext, clientip);
+            if (!bankClass) return NotFound();
             return bankClass;
         }
     }

@@ -17,9 +17,7 @@ namespace orderAPi.Models
             dbparams.Add(new dbparam("@newid", new sha256().encry256($"{clientJson["clientid"].ToString().TrimEnd()}{randomJson["random"].ToString().TrimEnd()}{clientJson["accesstoken"].ToString().TrimEnd()}")));
             List<Dictionary<string, object>> items = new List<Dictionary<string, object>>();
             foreach (DataRow dr in new database().checkSelectSql("mssql", "eatingstring", "eat.searchsuggest @newid;", dbparams).Rows)
-            {
                 items.Add(new Dictionary<string, object>() { { "category", new Dictionary<string, object>() { { "requireid", new Dictionary<string, object>() { { "orderid", dr["orderid"].ToString().TrimEnd() } } }, { "shop", JsonSerializer.Deserialize<Dictionary<string, object>>(dr["shop"].ToString().TrimEnd()) } } }, { "date", new Dictionary<string, object>() { { "data", dr["indate"].ToString().TrimEnd() } } }, { "time", new Dictionary<string, object>() { { "data", dr["intime"].ToString().TrimEnd() } } } });
-            }
             return items;
         }
 

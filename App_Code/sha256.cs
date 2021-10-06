@@ -28,5 +28,10 @@ namespace orderAPi.App_Code
                     return null;
             }
         }
+
+        public string[] substr256(string datakey, int length)
+        {
+            return new string[] { datakey.Substring(length).Trim(), datakey.Substring(0, length).Trim() };
+        }
     }
 }
